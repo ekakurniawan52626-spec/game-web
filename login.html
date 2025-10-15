@@ -151,11 +151,10 @@
       btn.disabled = true;
       btn.textContent = 'Memproses...';
 
-      setTimeout(() => {
-        alert('Login berhasil! Selamat datang ' + email.value);
-        localStorage.setItem('loggedIn', 'true');
-        window.location.href = 'loading.html';
-      }, 800);
+     setTimeout(() => {
+    localStorage.setItem('loggedIn', 'true');
+    window.location.href = 'loading.html';
+}, 800);
     });
   </script>
 </body>
