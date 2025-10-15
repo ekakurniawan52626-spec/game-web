@@ -18,7 +18,7 @@
       color:#e6eef8;
     }
 
-    .container{max-width:1100px;margin:36px auto;padding:28px}
+    .container{max-width:1100px;margin:36px auto;padding:28px; display:none;} /* container awal disembunyikan */
     header{display:flex;align-items:center;justify-content:space-between;gap:16px}
     .brand{display:flex;gap:12px;align-items:center}
     .logo{
@@ -109,17 +109,32 @@
       align-items:center;min-height:320px;gap:10px;
     }
     @media (max-width:600px){.hero{flex-direction:column}.hero-right{width:100%}}
-  </style>
 
-  <script>
-    // 🔐 Cek login: kalau belum login, redirect ke halaman login
-    if (localStorage.getItem('loggedIn') !== 'true') {
-      window.location.href = "login.html";
+    /* loading screen */
+    #loading-screen {
+      position: fixed; inset:0;
+      display:flex; flex-direction:column;
+      justify-content:center; align-items:center;
+      background: rgba(0,0,0,0.9);
+      color: #fff;
+      font-size:2em;
+      z-index:9999;
     }
-  </script>
+    #loading-screen p {
+      font-size:0.9em;
+      color:#aaa;
+      margin-top:10px;
+    }
+  </style>
 </head>
 
 <body>
+  <!-- Loading screen -->
+  <div id="loading-screen">
+    <div>Loading...</div>
+    <p>Mohon tunggu sebentar</p>
+  </div>
+
   <div class="container">
     <header>
       <div class="brand">
@@ -152,7 +167,6 @@
     </section>
 
     <section class="grid" aria-label="Koleksi game">
-
       <article class="card">
         <div class="thumb">🧠 Memory</div>
         <h3>Memory</h3>
@@ -162,7 +176,6 @@
           <button class="small-btn" onclick="notifySoon()">Info</button>
         </div>
       </article>
-
 
       <article class="card">
         <div class="thumb">🧠 Memory</div>
@@ -200,24 +213,37 @@
   </div>
 
   <script>
-    document.getElementById('year').textContent = new Date().getFullYear();
+    document.addEventListener('DOMContentLoaded', () => {
+      // Cek login
+      if(localStorage.getItem('loggedIn') !== 'true') {
+        window.location.href = "login.html";
+        return;
+      }
 
-    // Tombol Logout
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-      localStorage.removeItem('loggedIn');
-      window.location.href = 'login.html';
+      // Tampilkan loading dulu selama 1 detik
+      const loading = document.getElementById('loading-screen');
+      const container = document.querySelector('.container');
+      setTimeout(() => {
+        loading.style.display = 'none';
+        container.style.display = 'block';
+      }, 1000);
+
+      // Tahun otomatis
+      document.getElementById('year').textContent = new Date().getFullYear();
+
+      // Tombol Logout
+      document.getElementById('logoutBtn').addEventListener('click', () => {
+        localStorage.removeItem('loggedIn');
+        window.location.href = 'login.html';
+      });
+
+      // Top score
+      let topScore = Number(localStorage.getItem('ah_topscore') || 0);
+      document.getElementById('topScore').textContent = topScore;
     });
 
     // Game helpers
-    let topScore = Number(localStorage.getItem('ah_topscore') || 0);
-    document.getElementById('topScore').textContent = topScore;
-
     function notifySoon(){alert('Game ini akan segera hadir — stay tuned!');}
-    function share(){
-      navigator.clipboard?.writeText(location.href)
-        .then(()=>alert('Link disalin ke clipboard'));
-    }
-
     function openGame(name){
       const modal = document.getElementById('modal');
       const area = document.getElementById('gameArea');
@@ -247,7 +273,6 @@
       document.getElementById('gameArea').innerHTML = '';
     }
 
-    // Game logic
     function initClickBox(){
       const boxArea = document.getElementById('boxArea');
       const scoreEl = document.getElementById('score');
