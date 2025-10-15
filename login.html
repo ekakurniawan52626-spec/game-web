@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login — Arcade Hub</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html,body { height: 100%; font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; }
+
+    body {
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #0f172a 0%, #0b1220 50%, #071027 100%);
+      color: #e6eef8;
+      padding: 24px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 420px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 28px;
+      box-shadow: 0 6px 30px rgba(2,6,23,0.6);
+      backdrop-filter: blur(6px);
+    }
+
+    h1 { font-size: 20px; margin-bottom: 6px; }
+    p.lead { color: rgba(230,238,248,0.75); margin-bottom: 18px; font-size: 14px; }
+
+    .form-group { margin-bottom: 14px; }
+    label { display: block; font-size: 13px; margin-bottom: 6px; color: rgba(230,238,248,0.9); }
+    input[type="email"], input[type="password"] {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.02);
+      color: #e6eef8;
+      font-size: 14px;
+    }
+
+    .row { display:flex; gap:10px; align-items:center; }
+    .remember { display:flex; align-items:center; gap:8px; font-size:13px; color: rgba(230,238,248,0.8); }
+
+    button.btn {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: none;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      background: linear-gradient(90deg,#2563eb,#7c3aed);
+      color: white;
+      box-shadow: 0 6px 18px rgba(124,58,237,0.18);
+    }
+
+    .muted { color: rgba(230,238,248,0.6); font-size:13px; text-align:center; margin-top:12px; }
+    .links { display:flex; justify-content:space-between; margin-top:8px; font-size:13px; }
+    a { color: #9bb7ff; text-decoration:none; }
+    a:hover { text-decoration: underline; }
+
+    .pw-toggle { background: none; border: none; color: #9bb7ff; cursor: pointer; font-size:13px; }
+
+    @media (max-width:420px){ .card { padding: 18px; } }
+
+    .error { border-color: rgba(255,90,90,0.9); }
+    .helper { font-size:12px; color: rgba(230,238,248,0.7); margin-top:6px; }
+    .helper.error { color: #ffb4b4; }
+  </style>
+</head>
+<body>
+  <main class="card" role="main">
+    <h1>Masuk ke akunmu</h1>
+    <p class="lead">Masukkan email dan kata sandi untuk melanjutkan.</p>
+
+    <form id="loginForm" autocomplete="on" novalidate>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" placeholder="name@contoh.com" required aria-required="true" />
+        <div id="emailHelp" class="helper" aria-live="polite"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Kata sandi</label>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <input id="password" name="password" type="password" minlength="6" placeholder="Masukkan kata sandi" required aria-required="true" style="flex:1;" />
+          <button type="button" id="togglePw" class="pw-toggle" aria-pressed="false" aria-label="Tampilkan kata sandi">Tampilkan</button>
+        </div>
+        <div id="pwHelp" class="helper"></div>
+      </div>
+
+      <div class="form-group row">
+        <label class="remember"><input type="checkbox" id="remember" name="remember" /> Ingat saya</label>
+        <div style="margin-left:auto;"><a href="#">Lupa kata sandi?</a></div>
+      </div>
+
+      <div class="form-group">
+        <button class="btn" type="submit">Masuk</button>
+      </div>
+
+      <div class="muted">Belum punya akun? <a href="#">Daftar</a></div>
+    </form>
+  </main>
+
+  <script>
+    const form = document.getElementById('loginForm');
+    const email = document.getElementById('email');
+    const pw = document.getElementById('password');
+    const emailHelp = document.getElementById('emailHelp');
+    const pwHelp = document.getElementById('pwHelp');
+    const toggle = document.getElementById('togglePw');
+
+    toggle.addEventListener('click', () => {
+      const shown = pw.type === 'text';
+      pw.type = shown ? 'password' : 'text';
+      toggle.textContent = shown ? 'Tampilkan' : 'Sembunyikan';
+      toggle.setAttribute('aria-pressed', String(!shown));
+    });
+
+    function showError(el, msg){
+      el.classList.add('error');
+      return msg;
+    }
+    function clearError(el){ el.classList.remove('error'); }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      emailHelp.textContent = '';
+      pwHelp.textContent = '';
+      clearError(email); clearError(pw);
+
+      let ok = true;
+
+      if (!email.value || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.value)){
+        emailHelp.textContent = showError(email, 'Masukkan email yang valid.');
+        emailHelp.classList.add('error');
+        ok = false;
+      }
+      if (!pw.value || pw.value.length < 6){
+        pwHelp.textContent = showError(pw, 'Kata sandi minimal 6 karakter.');
+        pwHelp.classList.add('error');
+        ok = false;
+      }
+      if (!ok) return;
+
+      const btn = form.querySelector('button[type="submit"]');
+      btn.disabled = true;
+      btn.textContent = 'Memproses...';
+
+      setTimeout(() => {
+        alert('Login berhasil! Selamat datang ' + email.value);
+        localStorage.setItem('loggedIn', 'true');
+        window.location.href = 'loading.html';
+      }, 800);
+    });
+  </script>
+</body>
+</html>
